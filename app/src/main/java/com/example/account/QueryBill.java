@@ -9,6 +9,9 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TabHost;
 
+/**
+ * 监听日账单和月账单按钮，同时保存现场
+ */
 public class QueryBill extends TabActivity {
 	/*public static final String TAB_HOME = "tabHome";
 	public static final String TAB_MES = "tabMes";

@@ -15,9 +15,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * 今日账单适配器类
+ */
 class Adapter_TD extends BaseAdapter
 {
+    // 是否被选中
     public Map<typeClass, Boolean> isSelected;
+    // 辅助上个数据结构完成判断
     public List<typeClass> positions = null;
     private List<Map<String, Object>> data;
     private LayoutInflater mInflater;
