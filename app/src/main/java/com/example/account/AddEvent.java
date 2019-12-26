@@ -1,12 +1,12 @@
 package com.example.account;
-/****************
- * Author:Zachary(F.SB)
- *
- *
- * ********************/
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.SimpleTimeZone;
 
+import models.MyPackage;
 import models.TradeClass;
 import models.consumeClass;
 
@@ -15,7 +15,11 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,11 +36,16 @@ import android.widget.Toast;
 
 public class AddEvent extends Activity{
 	private TextView addDate = null;
+	// 下拉菜单
 	private Spinner typeSpinner;
 	public String addType="";
 	private Button addButton;
 	private EditText money;
 	DatePickerDialog.OnDateSetListener OnDateSetListener ;
+	MediaPlayer mediaPlayer;
+	public void initPlay(){
+		mediaPlayer = MediaPlayer.create(AddEvent.this,R.raw.consume);
+	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,12 +71,26 @@ public class AddEvent extends Activity{
 		this.addButton = ((Button)findViewById(R.id.addButton));
 		this.addButton.setOnClickListener(new AddPocketClick());
 		this.money = ((EditText)findViewById(R.id.money));
-
+		Date date = new Date();
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		addDate.setText(format.format(date));
 		OnDateSetListener = new DatePickerDialog.OnDateSetListener()
 		{
 			public void onDateSet(DatePicker paramDatePicker, int paramInt1, int paramInt2, int paramInt3)
 			{
-				AddEvent.this.addDate.setText(paramInt1 + "-" + (paramInt2 + 1) + "-" + paramInt3);
+				String mm = "0";
+				String dd = "0";
+				if(paramInt2 + 1 < 10){
+					mm += String.valueOf(paramInt2+1);
+				}else{
+					mm = String.valueOf(paramInt2+1);
+				}
+				if (paramInt3 < 10){
+					dd += String.valueOf(paramInt3);
+				}else{
+					dd = String.valueOf(paramInt3);
+				}
+				AddEvent.this.addDate.setText(paramInt1 + "-" + mm + "-" + dd);
 			}
 		};
 		/*
@@ -99,6 +122,26 @@ public class AddEvent extends Activity{
 		return new DatePickerDialog(this, this.OnDateSetListener, i, j, k);
 	}
 
+	/*private void showSettings() { // 读首选项
+		String prefsName = getPackageName() + "_preferences";  //[PACKAGE_NAME]_preferences
+		SharedPreferences prefs = getSharedPreferences(prefsName, Context.MODE_PRIVATE);
+
+		String nickName = prefs.getString("nickName", "机器人");
+		textView.setText("欢迎您：" + nickName);
+
+		boolean nightMode = prefs.getBoolean("nightMode", false);
+		textView.setBackgroundColor(nightMode ? Color.BLACK : Color.WHITE);
+
+		String textSize = prefs.getString("textSize", "0");
+		if (textSize.equals("0")) {
+			textView.setTextSize(18f);
+		} else if (textSize.equals("1")) {
+			textView.setTextSize(22f);
+		} else if (textSize.equals("2")) {
+			textView.setTextSize(36f);
+		}
+	}*/
+
 	//弹出提示
 	private void dialog()
 	{
@@ -112,7 +155,20 @@ public class AddEvent extends Activity{
 				consumeClass trade=new consumeClass(0, Float.parseFloat("-"+AddEvent.this.money.getText().toString()), AddEvent.this.addDate.getText().toString(), "123", addType, AddEvent.this);
 
 				trade.trade_add();
-				Toast.makeText(AddEvent.this, "添加完成", 0).show();
+				MyPackage myPackage = new MyPackage(AddEvent.this);
+				float consumeSum = myPackage.getConsumeSum();
+				String prefsName = getPackageName() + "_preferences";  //[PACKAGE_NAME]_preferences
+				SharedPreferences prefs = getSharedPreferences(prefsName, Context.MODE_PRIVATE);
+				String moneyFlagStr = prefs.getString("moneyFlag", "1000");
+				float moneyFlag = Float.valueOf(moneyFlagStr);
+				if (consumeSum < -moneyFlag){
+					initPlay();
+					if (!mediaPlayer.isPlaying()){
+						mediaPlayer.start();
+					}
+				}
+				Toast.makeText(AddEvent.this, consumeSum+"添加完成", Toast.LENGTH_SHORT).show();
+
 			}
 		}).setNegativeButton("取消", new DialogInterface.OnClickListener()
 		{
@@ -133,12 +189,12 @@ public class AddEvent extends Activity{
 		{
 			if (AddEvent.this.addDate.getText().equals("点击选择日期"))
 			{
-				Toast.makeText(AddEvent.this, "请先选择消费日期", 0).show();
+				Toast.makeText(AddEvent.this, "请先选择消费日期", Toast.LENGTH_SHORT).show();
 				return;
 			}
 			if (AddEvent.this.money.getText().toString().trim().length() == 0)
 			{
-				Toast.makeText(AddEvent.this, "请先填写消费金额", 0).show();
+				Toast.makeText(AddEvent.this, "请先填写消费金额", Toast.LENGTH_SHORT).show();
 				return;
 			}
 			AddEvent.this.dialog();

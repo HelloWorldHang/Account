@@ -63,7 +63,7 @@ class Adapter_LS extends BaseAdapter
         localViewHolder.cBox = ((CheckBox)paramView.findViewById(R.id.check));
         (localViewHolder).img.setBackgroundResource(((Integer)((Map)this.data.get(paramInt)).get("icon")).intValue());
         localViewHolder.title.setText(((Map)this.data.get(paramInt)).get("type").toString());
-        localViewHolder.price.setText("гд" + ((Map)this.data.get(paramInt)).get("money").toString());
+        localViewHolder.price.setText("￥" + ((Map)this.data.get(paramInt)).get("money").toString());
         int i=((Integer) ((Map)this.data.get(paramInt)).get("_id")).intValue();
         positions.add(i);
         //Toast.makeText(paramContext0, "ddd"+i, 0).show();

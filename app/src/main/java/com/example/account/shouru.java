@@ -1,8 +1,11 @@
 package com.example.account;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
+import models.MyPackage;
 import models.consumeClass;
 import models.incomeClass;
 
@@ -10,7 +13,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,6 +36,10 @@ public class shouru  extends Activity{
 	private Button addButton;
 	private EditText money;
 	DatePickerDialog.OnDateSetListener OnDateSetListener ;
+	MediaPlayer mediaPlayer;
+	public void initPlay(){
+		mediaPlayer = MediaPlayer.create(shouru.this,R.raw.income);
+	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -50,12 +60,26 @@ public class shouru  extends Activity{
 		this.addButton = ((Button)findViewById(R.id.income_addButton));
 		this.addButton.setOnClickListener(new AddPocketClick());
 		this.money = ((EditText)findViewById(R.id.income_money));
-
+		Date date = new Date();
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		addDate.setText(format.format(date));
 		OnDateSetListener = new DatePickerDialog.OnDateSetListener()
 		{
 			public void onDateSet(DatePicker paramDatePicker, int paramInt1, int paramInt2, int paramInt3)
 			{
-				shouru.this.addDate.setText(paramInt1 + "-" + (paramInt2 + 1) + "-" + paramInt3);
+				String mm = "0";
+				String dd = "0";
+				if(paramInt2 + 1 < 10){
+					mm += String.valueOf(paramInt2+1);
+				}else{
+					mm = String.valueOf(paramInt2+1);
+				}
+				if (paramInt3 < 10){
+					dd += String.valueOf(paramInt3);
+				}else{
+					dd = String.valueOf(paramInt3);
+				}
+				addDate.setText(paramInt1 + "-" + mm + "-" + dd);
 			}
 		};
 
@@ -89,7 +113,18 @@ public class shouru  extends Activity{
 						shouru.this.addDate.getText().toString(), "123", addType, shouru.this);
 
 				trade.trade_add();
-				Toast.makeText(shouru.this, "添加完成", 0).show();
+				String prefsName = getPackageName() + "_preferences";  //[PACKAGE_NAME]_preferences
+				SharedPreferences prefs = getSharedPreferences(prefsName, Context.MODE_PRIVATE);
+				String incomeMoneyFlagStr = prefs.getString("incomeMoneyFlag", "15000");
+				MyPackage myPackage = new MyPackage(shouru.this);
+				float incomeSum = myPackage.getIncomeSum();
+				if (incomeSum > Float.valueOf(incomeMoneyFlagStr)){
+					initPlay();
+					if (!mediaPlayer.isPlaying()){
+						mediaPlayer.start();
+					}
+				}
+				Toast.makeText(shouru.this, "添加完成", Toast.LENGTH_SHORT).show();
 			}
 		}).setNegativeButton("取消", new DialogInterface.OnClickListener()
 		{
@@ -110,12 +145,12 @@ public class shouru  extends Activity{
 		{
 			if (shouru.this.addDate.getText().equals("点击选择日期"))
 			{
-				Toast.makeText(shouru.this, "请先选择收入日期", 0).show();
+				Toast.makeText(shouru.this, "请先选择收入日期", Toast.LENGTH_SHORT).show();
 				return;
 			}
 			if (shouru.this.money.getText().toString().trim().length() == 0)
 			{
-				Toast.makeText(shouru.this, "请先填写收入金额", 0).show();
+				Toast.makeText(shouru.this, "请先填写收入金额", Toast.LENGTH_SHORT).show();
 				return;
 			}
 			shouru.this.dialog();

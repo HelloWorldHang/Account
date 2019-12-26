@@ -4,6 +4,9 @@ import java.util.Date;
 
 import android.content.Context;
 
+/**
+ * 消费账单类
+ */
 public class consumeClass extends TradeClass{
 
 

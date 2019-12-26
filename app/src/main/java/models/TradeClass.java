@@ -66,6 +66,7 @@ public abstract class TradeClass {
 	    }
 	}
 
+
 	
 	private int GetMaxid(){
 		db=dbhelper.getWritableDatabase();

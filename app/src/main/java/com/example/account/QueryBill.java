@@ -9,12 +9,11 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TabHost;
 
-@SuppressWarnings("deprecation")
 public class QueryBill extends TabActivity {
-	public static final String TAB_HOME = "tabHome";
+	/*public static final String TAB_HOME = "tabHome";
 	public static final String TAB_MES = "tabMes";
-	public static final String TAB_TOUCH = "tab_touch";
-	private RadioButton b = null;
+	public static final String TAB_TOUCH = "tab_touch";*/
+	private RadioButton checked = null;
 	private RadioGroup group;
 	private TabHost tabHost;
 	  
@@ -29,34 +28,32 @@ public class QueryBill extends TabActivity {
 	    Intent billIntent1=new Intent();
 	    billIntent1.setClass(this, QueryByTodayActivity.class);
 		//LayoutInflater.from(this).inflate(R.layout.bill_query, tabHost.getTabContentView(), true);
-
-	    this.tabHost.addTab(this.tabHost.newTabSpec("tabHome")
+		// 查询今日账单
+	    tabHost.addTab(tabHost.newTabSpec("tabHome")
 	    		.setIndicator("tabHome")
 	    		.setContent(billIntent1));
-	    
-	    this.tabHost.addTab(this.tabHost.newTabSpec("tabMes")
+	    // 查询本月账单
+	    tabHost.addTab(tabHost.newTabSpec("tabMes")
 	    		.setIndicator("tabMes")
 	    		.setContent(new Intent(this, QueryByMouthActivity.class)));
-	    
-	    this.b = ((RadioButton)findViewById(R.id.radio_button0));
-	    this.b.setChecked(true);
-	    
+	    // 默认选中今日账单
+	    checked = ((RadioButton)findViewById(R.id.radio_button0));
+	    checked.setChecked(true);
+	    // 点击监听
 	    this.group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
 	    {
 	      public void onCheckedChanged(RadioGroup paramRadioGroup, int paramInt)
 	      {
 	        switch (paramInt)
 	        {
-	        default:
-	          return;
 	        case R.id.radio_button0:
 	        	QueryBill.this.tabHost.setCurrentTabByTag("tabHome");
 	          return;
 	        case R.id.radio_button1:
+				QueryBill.this.tabHost.setCurrentTabByTag("tabMes");
+				return;
 	        }
-	        QueryBill.this.tabHost.setCurrentTabByTag("tabMes");
 	      }
 	    });
-	   
 	  }
 }

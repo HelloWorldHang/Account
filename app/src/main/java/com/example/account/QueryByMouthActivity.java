@@ -1,12 +1,16 @@
 package com.example.account;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,7 +23,7 @@ import models.MyPackage;
 import models.TradeClass;
 import models.consumeClass;
 
-public class QueryByMouthActivity extends Activity
+public class QueryByMouthActivity extends AppCompatActivity
 {
 	String[] bill_array=null;
 	private ListView listView;
@@ -39,14 +43,16 @@ public class QueryByMouthActivity extends Activity
 		String str1=new String(year+"-"+month);
 		String str;
 		List<Map<String, Object>> list=new ArrayList<Map<String, Object>>();
-		float todaymenoy=0;
+		float monthOutMenoy=0;
+		float monthIncomeMenoy = 0;
 		MyPackage pack=new MyPackage(this);
+		monthOutMenoy = pack.getConsumeSum();
+		monthIncomeMenoy = pack.getIncomeSum();
 		List<TradeClass> List=pack.getAlltrade();
 		for(TradeClass con:List){
 			str = con.gettime();
 			str=str.substring(0, str.lastIndexOf('-'));
 			if(str1.equals(str)){
-				todaymenoy+=con.getMoney();
 				Map<String,Object> map=new HashMap<String,Object>();
 				map.put("_id", con.getId());
 				map.put("money", ""+con.getMoney());
@@ -78,7 +84,7 @@ public class QueryByMouthActivity extends Activity
 		}
 		localmap = new HashMap<Integer, Boolean>();
 		myadapter=new Adapter_LS(this, list, localmap);
-		textView.setText("本月共花费："+(-todaymenoy)+"元");
+		textView.setText("本月共花费："+(-monthOutMenoy)+"元,共收入"+monthIncomeMenoy+"元");
 		listView.setAdapter(myadapter);
 	}
 
@@ -91,14 +97,39 @@ public class QueryByMouthActivity extends Activity
 
 	public boolean onCreateOptionsMenu(Menu paramMenu)
 	{
-		paramMenu.add(0, 1, 1, "删除").setIcon(R.drawable.delete);
-		return super.onCreateOptionsMenu(paramMenu);
+		MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.del_menu,paramMenu);
+        return true;
+		/*paramMenu.add(0, 1, 1, "删除").setIcon(R.drawable.delete);
+		return super.onCreateOptionsMenu(paramMenu);*/
 	}
 
-	public boolean onOptionsItemSelected(MenuItem paramMenuItem){
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()){
+			case R.id.baobiao:
+				Intent intent = new Intent(QueryByMouthActivity.this, baobiao.class);
+				//如果requestCode >= 0 则返回结果时会回调 onActivityResult()方法
+				intent.putExtra("flag","month");
+				startActivity(intent);
+				break;
+			case R.id.delItem:
+				Toast.makeText(QueryByMouthActivity.this,"月账单不能删除",Toast.LENGTH_SHORT).show();
+				break;
+			case R.id.menu3:
+				Toast.makeText(QueryByMouthActivity.this,"敬请期待",Toast.LENGTH_SHORT).show();
+				break;
+			default:
+				finish();
+		}
+
+		return true;
+	}
+
+	/*public boolean onOptionsItemSelected(MenuItem paramMenuItem){
 		// = Adapter_TD.isSelected;
-		Toast.makeText(this, "不能做假账哦!", Toast.LENGTH_SHORT).show();
-		  /*
+		Toast.makeText(this, "不能做假账哦!", 0).show();
+		  *//*
 		    if (localmap.size() <= 0)
 		    {
 		      Toast.makeText(this, "请先选择要删除的消费记录!", 0).show();
@@ -115,9 +146,9 @@ public class QueryByMouthActivity extends Activity
 			     }
 			     //Log.i("nihao","key=" + key + " value=" + value);
 		    }
-		    fillList(); */
+		    fillList(); *//*
 		return true;
-	}
+	}*/
 
 	protected void onResume()
 	{

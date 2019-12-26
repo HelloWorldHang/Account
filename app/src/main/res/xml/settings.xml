@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="settings"
+    android:title="软件设置">
+    <PreferenceCategory
+        android:key="basic"
+        android:title="基本设置">
+        <EditTextPreference
+            android:key="moneyFlag"
+            android:title="额度超出提醒"
+            android:defaultValue="1000"/>
+        <EditTextPreference
+            android:key="incomeMoneyFlag"
+            android:title="收入达标提醒"
+            android:defaultValue="15000"/>
+    </PreferenceCategory>
+</PreferenceScreen>
